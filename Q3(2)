@@ -1,0 +1,480 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+import numpy as np 
+# 读取数据
+df = pd.read_csv(r'D:\task1-3\task1-3\processed-data\modis_heilongjiang_classified_fires.csv')
+
+# 创建农业火与非农业火的分类
+df['fire_category'] = df['fire_type'].map(
+    lambda x: 'Agricultural' if x in ['Maize_Straw_Burning', 'Wheat_Straw_Burning']
+    else 'Non-agricultural' if x in ['Cropland_Fire_Other', 'Non_Cropland_Fire'] else 'Other'
+)
+
+# 基础统计分析
+ag_stats = df[df['fire_category']=='Agricultural']['frp'].describe()
+non_ag_stats = df[df['fire_category']=='Non-agricultural']['frp'].describe()
+
+# 设置整体风格和字体大小
+plt.style.use('seaborn-v0_8')
+plt.rcParams.update({
+    'font.size': 12,
+    'axes.labelsize': 14,
+    'axes.titlesize': 16,
+    'xtick.labelsize': 12,
+    'ytick.labelsize': 12
+})
+
+# 创建画布
+fig, ax = plt.subplots(figsize=(12, 8), dpi=300)
+colors = {'Agricultural': '#2ecc71', 'Non-agricultural': '#e74c3c'}
+
+# 创建箱线图
+box_plot = sns.boxplot(x='fire_category', y='frp', 
+           data=df[df['fire_category'].isin(['Agricultural', 'Non-agricultural'])],
+           palette=colors,
+           width=0.5,
+           linewidth=2,
+           fliersize=3,  # 减小异常值点的大小
+           ax=ax,
+           whis=1.5)    # 设置须的长度
+
+ # 添加均值点并调整样式 - 减小点的大小和调整透明度
+point_plot = sns.pointplot(x='fire_category', y='frp', 
+             data=df[df['fire_category'].isin(['Agricultural', 'Non-agricultural'])],
+             color='darkblue',
+             markers='D',
+             scale=0.3,  # 进一步减小点的大小
+             alpha=0.6,
+             ax=ax,
+             zorder=3)
+
+# 调整字体大小和标签样式
+plt.title('Fire Radiative Power (FRP) Distribution by Fire Type\n(2010-2019)',
+         pad=20,
+         fontweight='bold',
+         fontsize=14)
+plt.ylabel('Fire Radiative Power (MW)',
+         fontweight='bold',
+         fontsize=12)
+plt.xlabel('Fire Type',
+         fontweight='bold',
+         fontsize=12)
+
+# 调整y轴范围和刻度
+y_max = df['frp'].quantile(0.99)  # 使用99分位数作为上限
+ax.set_ylim(0, y_max)
+ax.yaxis.set_major_locator(plt.MaxNLocator(10))  # 设置y轴主刻度数量
+
+# 调整轴线粗细和样式
+ax.spines['bottom'].set_linewidth(0.5)
+ax.spines['left'].set_linewidth(0.5)
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+
+# 自定义x轴标签
+plt.xticks(ticks=[0, 1],
+          labels=['Non-agricultural\nFires', 'Agricultural\nFires'],
+          fontsize=10)
+
+# 调整y轴刻度标签的格式
+ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
+
+# 添加网格线
+ax.yaxis.grid(True, linestyle='--', alpha=0.7)
+
+# 自定义图例
+from matplotlib.patches import Patch
+legend_elements = [
+    Patch(facecolor=colors['Agricultural'], alpha=0.7, label='Agricultural Fires'),
+    Patch(facecolor=colors['Non-agricultural'], alpha=0.7, label='Non-agricultural Fires'),
+    plt.Line2D([0], [0], marker='D', color='darkblue', label='Mean FRP',
+               markerfacecolor='darkblue', markersize=8, linestyle='None', alpha=0.8)
+]
+ax.legend(handles=legend_elements,
+         loc='upper right',
+         title='Fire Types',
+         title_fontsize=12,
+         fontsize=10,
+         frameon=True,
+         framealpha=0.9)
+
+# 添加描述性文本
+
+plt.title('Comparison of Fire Intensity Distribution',
+          pad=30,  # 增加标题的上边距
+          fontweight='bold')
+
+# 调整布局
+plt.tight_layout()
+
+# 保存图像
+plt.savefig('frp_distribution_comparison2.png', dpi=300, bbox_inches='tight')
+
+# 显示图像
+plt.show()
+
+# 进行独立样本t检验
+ag_frp = df[df['fire_category']=='Agricultural']['frp']
+non_ag_frp = df[df['fire_category']=='Non-agricultural']['frp']
+t_stat, p_value = stats.ttest_ind(ag_frp, non_ag_frp)
+
+# 创建t检验结果可视化
+plt.figure(figsize=(12, 8), dpi=300)
+
+# 设置风格
+plt.style.use('seaborn-v0_8')
+plt.rcParams.update({
+    'font.size': 12,
+    'axes.labelsize': 14,
+    'axes.titlesize': 16,
+    'xtick.labelsize': 12,
+    'ytick.labelsize': 12
+})
+
+# 计算均值和置信区间
+def mean_confidence_interval(data, confidence=0.95):
+    from scipy import stats
+    mean = np.mean(data)
+    se = stats.sem(data)
+    ci = se * stats.t.ppf((1 + confidence) / 2, len(data)-1)
+    return mean, ci
+
+# 计算两组数据的均值和置信区间
+ag_mean, ag_ci = mean_confidence_interval(ag_frp)
+non_ag_mean, non_ag_ci = mean_confidence_interval(non_ag_frp)
+
+# 绘制条形图
+categories = ['Agricultural Fires', 'Non-agricultural Fires']
+means = [ag_mean, non_ag_mean]
+cis = [ag_ci, non_ag_ci]
+
+bars = plt.bar(categories, means, 
+        color=['#2ecc71', '#e74c3c'],
+        alpha=0.7,
+        width=0.6)
+
+# 添加误差线
+plt.errorbar(categories, means, yerr=cis, 
+             fmt='none', color='black', capsize=5)
+
+# 添加均值标签
+for bar in bars:
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height,
+             f'{height:.1f}',
+             ha='center', va='bottom')
+
+# 添加p值标注 - 使用轴的相对坐标（0-1），不要用 data 高度乘坐标
+max_height = max(means) + max(cis)
+p_value_text = f'p-value = {p_value:.4f}\nt-statistic = {t_stat:.4f}'
+if p_value < 0.05:
+    p_value_text += '\n(Significant difference)'
+ax = plt.gca()
+# 放在图的右上角（轴坐标），并保证不会被标题遮挡
+ax.text(0.98, 0.95, p_value_text,
+        ha='right',
+        va='top',
+        transform=ax.transAxes,
+        bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=5))
+
+# 设置标题和标签
+plt.title('Comparison of Mean FRP Between Fire Types\nwith 95% Confidence Intervals',
+          pad=30,  # 增加标题的上边距
+          fontweight='bold')
+plt.ylabel('Fire Radiative Power (MW)', fontweight='bold')
+plt.xlabel('Fire Type', fontweight='bold')
+
+# 添加网格线
+plt.grid(True, linestyle='--', alpha=0.3)
+
+# 调整y轴范围
+plt.ylim(0, max_height*1.2)
+
+# 添加显著性标记（如果p值显著）
+if p_value < 0.05:
+    y = max(means) + max(cis)
+    x1, x2 = 0, 1
+    plt.plot([x1, x1, x2, x2], [y*1.1, y*1.12, y*1.12, y*1.1], color='black')
+    plt.text((x1+x2)/2, y*1.13, '*', ha='center', va='bottom', fontsize=20)
+
+plt.tight_layout()
+
+# 保存图像
+plt.savefig('frp_ttest_comparison2.png', dpi=300, bbox_inches='tight')
+
+# 显示图像
+plt.show()
+
+
+# 创建密度图
+plt.figure(figsize=(12, 8), dpi=300)
+
+# 设置风格
+plt.style.use('seaborn-v0_8')
+plt.rcParams.update({
+    'font.size': 12,
+    'axes.labelsize': 14,
+    'axes.titlesize': 16,
+    'xtick.labelsize': 12,
+    'ytick.labelsize': 12
+})
+
+# 绘制密度曲线
+sns.kdeplot(data=df[df['fire_category']=='Agricultural'], 
+            x='frp', 
+            label='Agricultural Fires',
+            color='#2ecc71',
+            linewidth=2.5,
+            alpha=0.7,
+            fill=True)
+
+sns.kdeplot(data=df[df['fire_category']=='Non-agricultural'], 
+            x='frp', 
+            label='Non-agricultural Fires',
+            color='#e74c3c',
+            linewidth=2.5,
+            alpha=0.7,
+            fill=True)
+
+# 设置标题和标签
+plt.title('Fire Radiative Power (FRP) Distribution Density by Fire Type\n(2010-2019)',
+         pad=30,
+         fontweight='bold')
+plt.xlabel('Fire Radiative Power (MW)',
+         fontweight='bold')
+plt.ylabel('Density',
+         fontweight='bold')
+
+# 添加网格线
+plt.grid(True, linestyle='--', alpha=0.3)
+
+# 自定义图例
+plt.legend(title='Fire Categories',
+          title_fontsize=12,
+          fontsize=10,
+          frameon=True,
+          framealpha=0.9,
+          loc='upper right')
+
+
+
+# 设置x轴范围（去除极端值）
+x_max = df['frp'].quantile(0.99)  # 使用99分位数作为上限
+plt.xlim(0, x_max)
+
+# 添加均值线和标注
+for i, (category, color) in enumerate(zip(['Agricultural', 'Non-agricultural'], ['#2ecc71', '#e74c3c'])):
+    mean_val = df[df['fire_category']==category]['frp'].mean()
+    plt.axvline(x=mean_val, color=color, linestyle='--', alpha=0.8)
+    # 交错放置文本标签，调整字体大小
+    y_pos = plt.gca().get_ylim()[1] * (0.95 - i*0.1)  # 不同高度放置标签
+    plt.text(mean_val, y_pos,
+            f'Mean = {mean_val:.1f}',  # 简化文本
+            color=color,
+            ha='center',
+            va='top',
+            fontsize=8,  # 减小字体大小
+            bbox=dict(facecolor='white', alpha=0.8, pad=2))  # 添加白色背景框
+
+# 保存图像
+plt.savefig('frp_density_distribution2.png', dpi=300, bbox_inches='tight')
+
+# 显示图像
+plt.tight_layout()
+plt.show()
+
+from scipy.stats import mannwhitneyu
+import numpy as np
+
+# 准备数据（如果之前已有则复用）
+ag_frp = df[df['fire_category']=='Agricultural']['frp'].dropna().values
+non_ag_frp = df[df['fire_category']=='Non-agricultural']['frp'].dropna().values
+
+# Mann-Whitney U 检验
+u_stat, p_mw = mannwhitneyu(ag_frp, non_ag_frp, alternative='two-sided')
+n1, n2 = len(ag_frp), len(non_ag_frp)
+mu_u = n1 * n2 / 2
+sigma_u = np.sqrt(n1 * n2 * (n1 + n2 + 1) / 12)
+z = (u_stat - mu_u) / sigma_u
+r_effect = z / np.sqrt(n1 + n2)  # 近似效应量 r
+
+# Bootstrap 计算均值的 95% CI（用于图形的误差条）
+def bootstrap_mean_ci(x, n_boot=5000, ci=95, seed=0):
+    rng = np.random.default_rng(seed)
+    boots = []
+    for _ in range(n_boot):
+        bx = rng.choice(x, size=len(x), replace=True)
+        boots.append(np.mean(bx))
+    lo = np.percentile(boots, (100-ci)/2)
+    hi = np.percentile(boots, 100-(100-ci)/2)
+    return np.mean(x), (np.mean(x)-lo, hi-np.mean(x))  # 返回 mean 和 (lower_err, upper_err)
+
+ag_mean, ag_err = bootstrap_mean_ci(ag_frp)
+non_mean, non_err = bootstrap_mean_ci(non_ag_frp)
+
+# 绘图：均值条形图 + 非对称误差条（bootstrap）
+fig, ax = plt.subplots(figsize=(12, 8), dpi=300)  # 使用 fig, ax 便于放置注释在图外
+plt.style.use('seaborn-v0_8')
+plt.rcParams.update({'font.size':12, 'axes.labelsize':14, 'axes.titlesize':16})
+
+categories = ['Agricultural Fires', 'Non-agricultural Fires']
+means = [ag_mean, non_mean]
+# 将误差转换为 yerr 格式 (2 x N) 矩阵
+yerr = np.array([[ag_err[0], non_err[0]], [ag_err[1], non_err[1]]])
+
+# 缩小柱子宽度以避免与注释或边框重叠
+bars = ax.bar(categories, means,
+               color=['#2ecc71', '#e74c3c'],
+               alpha=0.7, width=0.45)
+
+# 添加误差线（上下不同）
+for i, bar in enumerate(bars):
+    lower = yerr[0, i]
+    upper = yerr[1, i]
+    ax.errorbar(bar.get_x() + bar.get_width()/2., bar.get_height(),
+                 yerr=np.array([[lower], [upper]]),
+                 fmt='none', color='black', capsize=5)
+
+# 均值标签（略微上移避免与误差线重合）
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height + 0.01 * max(means),
+             f'{height:.1f}', ha='center', va='bottom', fontsize=10)
+
+# 调整 y 轴上限为数据顶部留出空间（避免与注释/星号冲突）
+top_margin = max(means) + max(yerr[1, :]) * 2.0
+ax.set_ylim(0, top_margin * 1.15)
+
+# p值/统计量注释 - 放到图右侧外部（使用 figure 坐标），字体稍小以免遮挡
+stats_text = f"U = {int(u_stat):,}\nz = {z:.2f}\np = {p_mw:.4f}\nr ≈ {r_effect:.3f}"
+if p_mw < 0.05:
+    stats_text += '\n(Significant difference)'
+fig = plt.gcf()
+fig.text(0.92, 0.78, stats_text, ha='left', va='top',
+         fontsize=9,
+         bbox=dict(facecolor='white', alpha=0.9, edgecolor='none', pad=6))
+
+# 若显著，添加星号标记并绘制连线（位置依据轴数据而非绝对高度）
+if p_mw < 0.05:
+    # 在两柱上方画连线并放置星号，y_line 使用当前轴上限的比例定位
+    y_line = ax.get_ylim()[1] * 0.92
+    x1, x2 = bars[0].get_x() + bars[0].get_width()/2., bars[1].get_x() + bars[1].get_width()/2.
+    ax.plot([x1, x1, x2, x2], [y_line*0.98, y_line, y_line, y_line*0.98], color='black', linewidth=1.0)
+    ax.text((x1+x2)/2, y_line*1.01, '*', ha='center', va='bottom', fontsize=20)
+
+# 标题与标签
+ax.set_title('Comparison of Mean FRP Between Fire Types\nwith 95% Bootstrap CIs (Mann–Whitney)', pad=20, fontweight='bold')
+ax.set_ylabel('Fire Radiative Power (MW)', fontweight='bold')
+ax.set_xlabel('Fire Type', fontweight='bold')
+ax.grid(True, linestyle='--', alpha=0.3)
+
+# 留出右侧空间给注释并保存
+plt.tight_layout(rect=[0, 0, 0.9, 0.96])
+plt.savefig('frp_mannwhitney_comparison2.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+
+# 输出统计结果
+print("\nAgricultural Fires Statistics:")
+print(ag_stats)
+print("\nNon-agricultural Fires Statistics:")
+print(non_ag_stats)
+print("\nt-test results:")
+print(f"t-statistic: {t_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+
+# 计算每种类型的火点数量
+fire_counts = df['fire_category'].value_counts()
+print("\nFire counts by type:")
+print(fire_counts)
+
+# 图表展示：均值+CI、描述性统计表格、以及样本计数
+import pandas as pd
+
+# 准备描述性统计表（使用 describe 结果）
+summary = pd.DataFrame({
+    'Agricultural': ag_stats[['count','mean','std','min','25%','50%','75%','max']],
+    'Non-agricultural': non_ag_stats[['count','mean','std','min','25%','50%','75%','max']]
+})
+summary.index = ['count','mean','std','min','25%','50%','75%','max']
+
+# 准备均值与 bootstrap CI（之前计算得到 ag_mean, ag_err, non_mean, non_err）
+means = [ag_mean, non_mean]
+lower_err = [ag_err[0], non_err[0]]
+upper_err = [ag_err[1], non_err[1]]
+
+# 计数（保证顺序）
+counts = fire_counts.reindex(['Agricultural','Non-agricultural']).fillna(0).astype(int)
+count_labels = ['Agricultural','Non-agricultural']
+
+# 绘图：1x3 面板
+fig, axes = plt.subplots(1, 3, figsize=(16, 5), dpi=200, gridspec_kw={'width_ratios':[1,1.2,1]})
+plt.style.use('seaborn-v0_8')
+
+# 左：均值条形 + 非对称 bootstrap CI
+ax = axes[0]
+bar_positions = range(len(means))
+bars = ax.bar(bar_positions, means, color=['#2ecc71','#e74c3c'], width=0.5, alpha=0.8)
+# 非对称误差条
+for i,b in enumerate(bars):
+    ax.errorbar(b.get_x() + b.get_width()/2., b.get_height(),
+                yerr=np.array([[lower_err[i]],[upper_err[i]]]),
+                fmt='none', ecolor='black', capsize=6, elinewidth=1.2)
+    ax.text(b.get_x() + b.get_width()/2., b.get_height() + 0.01*max(means),
+            f'{means[i]:.1f}', ha='center', va='bottom', fontsize=9)
+ax.set_xticks(bar_positions)
+ax.set_xticklabels(['Agricultural','Non-agricultural'], rotation=0)
+ax.set_ylabel('Mean FRP (MW)')
+ax.set_title('Mean FRP with 95% Bootstrap CIs')
+
+# 中：描述性统计表
+ax = axes[1]
+ax.axis('off')
+tbl = ax.table(cellText=summary.round(2).values,
+               colLabels=summary.columns,
+               rowLabels=summary.index,
+               loc='center',
+               cellLoc='center')
+tbl.auto_set_font_size(False)
+tbl.set_fontsize(9)
+tbl.scale(1, 1.2)
+ax.set_title('Descriptive statistics (selected)')
+
+# 右：样本计数柱状图
+ax = axes[2]
+ax.bar(count_labels, counts.values, color=['#2ecc71','#e74c3c'], alpha=0.8)
+for i,v in enumerate(counts.values):
+    ax.text(i, v + max(counts.values)*0.02, f'{v:,}', ha='center', va='bottom', fontsize=9)
+ax.set_title('Sample counts by category')
+ax.set_ylabel('Number of fire points')
+
+
+
+plt.suptitle('FRP Summary: descriptive stats · means with CI · counts\n(statistical test results shown)', fontsize=12, fontweight='bold', y=0.98)
+plt.tight_layout(rect=[0,0,0.94,0.95])
+
+# 保存并展示
+plt.savefig('frp_stats_summary_visualization2.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+
+
+"""
+Challange one:
+Based on the classified fire data in HeiLongjiang Province, categorize Maize_Straw_Burning, Wheat_Straw_Burning,
+Cropland_Fire_Other, as agricultural fires, and Non_Cropland fires as wildfires. We draw box plots graph and
+statistic summary table, then find that there are 2890 agricultural fires, while the number
+of wildfires is 132622, which is much higher. And the max FRP of wildfire is 1824, also much higher
+than agricultural fire(315).And the mean value of wildfire's FRP is  higher than
+agricultural fire. We than carry statistic test to find whether significant difference between
+the two types of fire's FRP exist. We firstly investigate the distribution of FRP for both
+type, and find that both of them are not normal distribution. So we use Mann-Whitney U test after
+initial t-test. The result shows that the fire intensity between the two group has significant
+difference. So agricultural may be not the source of major intense buring events, and wildfires
+can cause much larger damage compared to agriculture fires.
+
+"""
