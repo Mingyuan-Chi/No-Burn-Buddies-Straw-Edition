@@ -465,8 +465,8 @@ plt.show()
 
 """
 Challange one:
-Based on the classified fire data in HeiLongjiang Province, categorize Maize_Straw_Burning, Wheat_Straw_Burning,
-Cropland_Fire_Other, as agricultural fires, and Non_Cropland fires as wildfires. We draw box plots graph and
+Based on the classified fire data in HeiLongjiang Province, categorize Maize_Straw_Burning and Wheat_Straw_Burning as agricultural fires,
+Cropland_Fire_Other and Non_Cropland fires as wildfires. We draw box plots graph and
 statistic summary table, then find that there are 2890 agricultural fires, while the number
 of wildfires is 132622, which is much higher. And the max FRP of wildfire is 1824, also much higher
 than agricultural fire(315).And the mean value of wildfire's FRP is  higher than
@@ -478,3 +478,4 @@ difference. So agricultural may be not the source of major intense buring events
 can cause much larger damage compared to agriculture fires.
 
 """
+
