@@ -6,7 +6,7 @@
 
 (PS: The "CHN_County.shp" is in the provided dataset, but it is too big (57M) for upload. So we don't upload it in this repository. We did use it for analysis, and sorry for any inconvenience caused.)
 # Task 4: Comparison of Agricultural and Other Fires  
-## research objective
+## Research objective
 This task aims to systematically compare the spatiotemporal and radiative characteristics between **agricultural fires** and **other fires** in Heilongjiang Province.  
 The analysis focuses on:  
 - Fire Radiative Power (FRP) differences  
@@ -68,13 +68,12 @@ To verify whether the differences between the two types of fire are significant,
 - Agricultural fires are concentrated from 10:00 to 15:00 during the day.
 - Other fires are more widely distributed, with a few night-time fire events.
 - This indicates that agricultural fires are mostly artificially controlled burning activities and are significantly influenced by human schedules and safe periods.
-## conclusions
+## Conclusions
 1. Agricultural fires show obvious characteristics of human control:
 - Concentrated occurrence time (spring and autumn)
 - Short duration and low intensity
 - Intraday distribution pattern (mainly during the day)
 It reflects the concentrated burning characteristics of agricultural activities such as straw burning.
-
 2. **Other fires** exhibit **higher uncertainty** :
 - It lasts longer
 - The intensity fluctuates more greatly
