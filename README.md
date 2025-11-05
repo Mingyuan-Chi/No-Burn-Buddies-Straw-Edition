@@ -39,7 +39,7 @@ To verify whether the differences between the two types of fire are significant,
 - **Kolmogorov-Smirnov (KS) test** to test the overall difference in distribution between the two groups
 ## Results and Analysis
 ### 1. Distribution of Event Duration
-! [Event Duration](results/figures/task4_duration_comparison.png)
+! [Event Duration](task4_duration_comparison.png)
 
 ** Result Summary: **
 - The duration of both types of fire incidents was highly concentrated within one day.
@@ -48,7 +48,7 @@ To verify whether the differences between the two types of fire are significant,
 
 ### 2. Fire radiation Power Distribution (FRP, log1p transformation)
 
-! [FRP Distribution](results/figures/task4_frp_comparison.png)
+! [FRP Distribution](task4_frp_comparison.png)
 
 **Result Summary:**
 - The FRP peak of agricultural fire is slightly to the left.
@@ -57,7 +57,7 @@ To verify whether the differences between the two types of fire are significant,
 
 ### 3. Time Distribution Characteristics (DOY and Hour)
 
-! [Temporal Distribution](results/figures/task4_time_distribution.png)
+! [Temporal Distribution](task4_time_distribution.png)
 
 **Annual Distribution (DOY)** :
 - Both types of fire show a bimodal distribution.
