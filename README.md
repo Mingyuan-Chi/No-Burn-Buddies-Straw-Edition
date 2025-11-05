@@ -8,12 +8,14 @@
 # Task 4: Comparison of Agricultural and Other Fires  
 ## Research Objective
 This task aims to systematically compare the spatiotemporal and radiative characteristics between **agricultural fires** and **other fires** in Heilongjiang Province.  
+
 The analysis focuses on:  
 - Fire Radiative Power (FRP) differences  
 - Event duration estimation using DBSCAN  
 - Seasonal (DOY) and diurnal (Hour) distribution differences
 ## Data and Preprocessing
 Input file ：modis_heilongjiang_classified_fires.csv
+
 Basic Pretreatment steps :
 1. Identify the time column and convert it to the 'datetime' type.
 2. Derived time features: 'year', 'month', 'doy' (day-of-year), 'hour', 'week'.
@@ -34,6 +36,7 @@ Basic Pretreatment steps :
 - **Intraday distribution (Hour)** : The hour when the ignition point occurs (0-23), reflecting the intraday pattern.
 
 4. Statistical test
+
 To verify whether the differences between the two types of fire are significant, the following non-parametric tests are adopted:
 - **Mann-Whitney U test** testing the median difference between the distributions of the two groups
 - **Kolmogorov-Smirnov (KS) test** to test the overall difference in distribution between the two groups
