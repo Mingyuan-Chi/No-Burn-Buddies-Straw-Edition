@@ -67,6 +67,7 @@ To verify whether the differences between the two types of fire are significant,
 - Spring (DOY 90-120) and autumn (DOY 270-300) correspond to the seasons of crop harvest and straw burning.
 - The peak of agricultural fires is more acute, indicating that their occurrence has a stronger seasonal regularity.
 - Other fires have a relatively smooth distribution throughout the year, indicating non-agricultural factors.
+
 **Intraday distribution (Hour)** :
 - Agricultural fires are concentrated from 10:00 to 15:00 during the day.
 - Other fires are more widely distributed, with a few night-time fire events.
