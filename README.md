@@ -13,8 +13,8 @@ The analysis focuses on:
 - Event duration estimation using DBSCAN  
 - Seasonal (DOY) and diurnal (Hour) distribution differences
 ## Data and Preprocessing
-**Input file **  ：modis_heilongjiang_classified_fires.csv
-**Basic Pretreatment steps ** :
+Input file ：modis_heilongjiang_classified_fires.csv
+Basic Pretreatment steps :
 1. Identify the time column and convert it to the 'datetime' type.
 2. Derived time features: 'year', 'month', 'doy' (day-of-year), 'hour', 'week'.
 3. Identify 'fire_type' (map to 'fire_type' if there is only 'type') Use 'agri_list = ['Maize_Straw_Burning', 'Wheat_Straw_Burning', 'Cropland_Fire_Other']' to determine whether it is an agricultural fire.
@@ -30,13 +30,13 @@ The analysis focuses on:
 - Compare the energy release intensity and dispersion of agricultural fires with those of other types of fires.
 
 3. Time Distribution Analysis
-- ** Annual Distribution (DOY) ** : On which day of the year the fire point occurs (1-365), reflecting the seasonality.
-- ** Intraday distribution (Hour) ** : The hour when the ignition point occurs (0-23), reflecting the intraday pattern.
+- **Annual Distribution (DOY)** : On which day of the year the fire point occurs (1-365), reflecting the seasonality.
+- **Intraday distribution (Hour)** : The hour when the ignition point occurs (0-23), reflecting the intraday pattern.
 
 4. Statistical test
 To verify whether the differences between the two types of fire are significant, the following non-parametric tests are adopted:
-- ** Mann-Whitney U test ** (testing the median difference between the distributions of the two groups)
-- ** Kolmogorov-Smirnov (KS) test ** (to test the overall difference in distribution between the two groups)
+- **Mann-Whitney U test** (testing the median difference between the distributions of the two groups)
+- **Kolmogorov-Smirnov (KS) test** (to test the overall difference in distribution between the two groups)
 ## Results and Analysis
 ### 1. Distribution of Event Duration
 ! [Event Duration](results/figures/task4_duration_comparison.png)
@@ -50,7 +50,7 @@ To verify whether the differences between the two types of fire are significant,
 
 ! [FRP Distribution](results/figures/task4_frp_comparison.png)
 
-** Result Summary: **
+**Result Summary:**
 - The FRP peak of agricultural fire is slightly to the left (in the low-energy range)
 - The distribution of other fires is more gentle, with a longer right tail, and there are a few high-intensity events.
 - The box plot shows that the distribution of agricultural fires is more concentrated and fluctuates less.
@@ -59,12 +59,12 @@ To verify whether the differences between the two types of fire are significant,
 
 ! [Temporal Distribution](results/figures/task4_time_distribution.png)
 
-** Annual Distribution (DOY) ** :
+**Annual Distribution (DOY)** :
 - Both types of fire show a bimodal distribution:
 - Spring (DOY 90-120) and autumn (DOY 270-300) correspond to the seasons of crop harvest and straw burning.
 - The peak of agricultural fires is more acute, indicating that their occurrence has a stronger seasonal regularity.
 - Other fires have a relatively smooth distribution throughout the year, indicating non-agricultural factors (such as natural or managed fire sources).
-** Intraday distribution (Hour) ** :
+**Intraday distribution (Hour)** :
 - Agricultural fires are concentrated from 10:00 to 15:00 during the day.
 - Other fires are more widely distributed, with a few night-time fire events.
 - This indicates that agricultural fires are mostly artificially controlled burning activities and are significantly influenced by human schedules and safe periods.
@@ -75,7 +75,7 @@ To verify whether the differences between the two types of fire are significant,
 - Intraday distribution pattern (mainly during the day)
 It reflects the concentrated burning characteristics of agricultural activities such as straw burning.
 
-2. ** Other fires ** exhibit ** higher uncertainty ** :
+2. **Other fires** exhibit **higher uncertainty** :
 - It lasts longer
 - The intensity fluctuates more greatly
 - The distribution of seasons and time periods is relatively scattered
