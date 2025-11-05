@@ -40,6 +40,7 @@ To verify whether the differences between the two types of fire are significant,
 ## Results and Analysis
 ### 1. Distribution of Event Duration
 ! [Event Duration](task4_duration_comparison.png)
+
 **Result Summary:**
 - The duration of both types of fire incidents was highly concentrated within one day.
 - The tail of the "Other Fires" distribution is slightly longer, and some events last for 2 to 5 days, indicating possible forest fires or grassland fires.
@@ -48,6 +49,7 @@ To verify whether the differences between the two types of fire are significant,
 ### 2. Fire radiation Power Distribution (FRP, log1p transformation)
 
 ! [FRP Distribution](task4_frp_comparison.png)
+
 **Result Summary:**
 - The FRP peak of agricultural fire is slightly to the left.
 - The distribution of other fires is more gentle, with a longer right tail, and there are a few high-intensity events.
@@ -56,6 +58,7 @@ To verify whether the differences between the two types of fire are significant,
 ### 3. Time Distribution Characteristics (DOY and Hour)
 
 ! [Temporal Distribution](task4_time_distribution.png)
+
 **Annual Distribution (DOY)** :
 - Both types of fire show a bimodal distribution.
 - Spring (DOY 90-120) and autumn (DOY 270-300) correspond to the seasons of crop harvest and straw burning.
