@@ -5,6 +5,36 @@
 # Authors: Wen Lu, Xiaoyu Fang, Run Wang, Zijun Xu and Mingyuan Chi
 
 (PS: The "CHN_County.shp" is in the provided dataset, but it is too big (57M) for upload. So we don't upload it in this repository. We did use it for analysis, and sorry for any inconvenience caused.)
+# Data Preprocessing and Event Definition 
+The initial phase focused on transforming raw MODIS hotspot observations into meaningful, distinct fire events and classifying them based on land cover type. This cleaned, event-based data serves as the foundation for the comparative analysis in Task 4.
+## 1. Data Cleaning and Classification (Task 1)
+Input: Raw MODIS Active Fire/Hotspot Data (Filtered to Heilongjiang Province).
+
+Basic Pretreatment Steps:
+1.Temporal Conversion: Converted raw observation time fields to standard datetime objects.
+2.Feature Derivation: Extracted granular temporal features including year, month, doy (day-of-year), hour, and week.
+3.Fire Type Mapping: Categorized the raw fire types into two primary groups based on agricultural context:
+Agricultural Fires: Maize_Straw_Burning, Wheat_Straw_Burning, Cropland_Fire_Other.
+Non-agricultural Fires (Other Fires): Non_Cropland_Fire.
+4.Geospatial Preparation: Created a GeoDataFrame from longitude/latitude and projected the data to the metric coordinate reference system EPSG:3857 for accurate spatial distance calculation.
+5.FRP Normalization: Prioritized FRP (Fire Radiative Power) and applied the log(1+x) transformation for improved statistical handling and visualization of the highly skewed energy release data.
+
+## 2. Spatiotemporal Event Detection (Tasks 2 & 3)
+To move from individual MODIS observations (hotspots) to unified fire incidents (events), we employed a density-based clustering methodology.
+
+Method: Density-Based Spatial Clustering of Applications with Noise (DBSCAN)
+
+DBSCAN was chosen for its ability to identify clusters of arbitrary shape and detect spatially and temporally related observations that belong to a single continuous burning incident.
+
+Clustering Metrics: The algorithm grouped hotspots based on two critical parameters:
+Spatial Proximity : Hotspots must be within a defined distance (e.g., 1 km).
+Temporal Proximity: Hotspots must occur within a defined time window (e.g., 6 hours).
+
+Event Attribute Calculation: Once clustered, each cluster was defined as a unique fire event. Event attributes calculated include:
+Start/End Time: The earliest and latest observation time within the cluster.
+Event Duration: The difference between the end and start times (used in Task 4).
+Total FRP: Sum of FRP values for all observations within the event.
+
 # Task 4: Comparison of Agricultural and Other Fires  
 ## Research Objective
 This task aims to systematically compare the spatiotemporal and radiative characteristics between **agricultural fires** and **other fires** in Heilongjiang Province.  
