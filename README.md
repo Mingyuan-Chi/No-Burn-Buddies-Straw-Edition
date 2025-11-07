@@ -5,7 +5,7 @@
 # Authors: Wen Lu, Xiaoyu Fang, Run Wang, Zijun Xu and Mingyuan Chi
 
 (PS: The "CHN_County.shp" is in the provided dataset, but it is too big (57M) for upload. So we don't upload it in this repository. We did use it for analysis, and sorry for any inconvenience caused.)
-# Data Preprocessing and Event Definition 
+# Task1-3：Data Preprocessing and Event Definition 
 The initial phase focused on transforming raw MODIS hotspot observations into meaningful, distinct fire events and classifying them based on land cover type. This cleaned, event-based data serves as the foundation for the comparative analysis in Task 4.
 ## 1. Data Cleaning and Classification (Task 1)
 Input: Raw MODIS Active Fire/Hotspot Data (Filtered to Heilongjiang Province).
